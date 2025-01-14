@@ -2,7 +2,6 @@
 #include <LowpassFilter.h>
 
 #define CUTOFFFREQUENCY 20.0f
-#define SAMPLERATEHZ 50
 #define SIGNALINPUTLENGTH 10
 
 LowPassFilter lpf{20.0f, FilterType::SECOND_ORDER};
@@ -16,7 +15,7 @@ void setup()
     Serial.print("Filtered output: ");
     for (int i = 0; i < SIGNALINPUTLENGTH; i++)
     {
-        float filteredOutput = lpf.Process(inputSignal[i], SAMPLERATEHZ * 0.001f);
+        float filteredOutput = lpf.Process(inputSignal[i], CUTOFFFREQUENCY * 0.001f);
         Serial.print(filteredOutput);
         Serial.print(" ");
     }
