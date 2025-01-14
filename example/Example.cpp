@@ -25,5 +25,5 @@ void setup()
 
 void loop()
 {
-    DElay(10);
+    Delay(10);
 }
