@@ -16,7 +16,7 @@ void setup()
     Serial.print("Filtered output: ");
     for (int i = 0; i < SIGNALINPUTLENGTH; i++)
     {
-        float filteredOutput = lpf.Process(inputSignal[i], SAMPLERATEHZ);
+        float filteredOutput = lpf.Process(inputSignal[i], SAMPLERATEHZ * 0.001f);
         Serial.print(filteredOutput);
         Serial.print(" ");
     }
