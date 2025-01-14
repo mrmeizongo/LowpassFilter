@@ -23,15 +23,9 @@ SOFTWARE.
  */
 #ifndef FILTER_H
 #define FILTER_H
-
-#ifdef ARDUINO
 #include <Arduino.h>
-#else
-#include <cmath>
-#define M_PI 3.14159265358979323846f
-#endif
 
-#define SQRT2 1.4142135623730950488f
+#define SQRT2 1.4142135623730950488f // Hard coded value of sqrt(2) to save execution cycles
 
 class Filter
 {
@@ -49,7 +43,7 @@ public:
         prevOutput = 0.0f;
     }
 
-    float Process(float input, float samplingFrequency)
+    float Process(float input, float samplingFrequency) override
     {
         // Calculate alpha based on the cuttoff frequency and sampling frequency
         prevOutput = prevOutput + ((samplingFrequency / (rc + samplingFrequency)) * (input - prevOutput));
@@ -85,7 +79,7 @@ public:
         a2 = (1.0f - alpha) * scale;
     }
 
-    float Process(float input, float samplingFrequency)
+    float Process(float input, float samplingFrequency) override
     {
         CalculateCoEfficients(samplingFrequency);
         float output = (b0 * input) + (b1 * prevInput1) + (b2 * prevInput2) - (a1 * prevOutput1) - (a2 * prevOutput2);
