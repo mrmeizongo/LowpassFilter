@@ -25,9 +25,9 @@ SOFTWARE.
 #define LOWPASSFILTER_H
 #include "Filter.h"
 
-enum class FilterType
+enum class FilterType : uint8_t
 {
-    FIRST_ORDER,
+    FIRST_ORDER = 0U,
     SECOND_ORDER
 };
 
