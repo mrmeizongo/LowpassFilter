@@ -27,6 +27,7 @@ SOFTWARE.
 
 #define SQRT2 1.4142135623730950488f // Hard coded value of sqrt(2) to save execution cycles
 
+// Abstract class for filters. All filters must implement the Process function
 class Filter
 {
 public:
@@ -34,6 +35,8 @@ public:
     virtual ~Filter() = default;
 };
 
+// Computationally less expensive than second order filter but less effective, has slower roll-off and limited flexibility
+// See https://en.wikipedia.org/wiki/Low-pass_filter#RC_filter
 class FirstOrderLPF : public Filter
 {
 public:
@@ -43,6 +46,7 @@ public:
         prevOutput = 0.0f;
     }
 
+    // Filter input signal to remove unwanted high frequency noise
     float Process(float input, float samplingFrequency) override
     {
         // Calculate alpha based on the cuttoff frequency and sampling frequency
@@ -55,11 +59,13 @@ private:
     float rc;
 };
 
+// More computationally expensive than first order filter but more effective, has faster roll-off and more flexibility
+// See https://en.wikipedia.org/wiki/Butterworth_filter#Normalized_Butterworth_polynomials
 class SecondOrderLPF : public Filter
 {
 public:
-    SecondOrderLPF(float cutoffFrequency)
-        : cutoffFrequency(cutoffFrequency), prevInput1(0.0f), prevInput2(0.0f), prevOutput1(0.0f), prevOutput2(0.0f) {}
+    SecondOrderLPF(float cutoffFrequency, float _prevInput1, float _prevInput2)
+        : cutoffFrequency(cutoffFrequency), prevInput1(_prevInput1), prevInput2(_prevInput2), prevOutput1(0.0f), prevOutput2(0.0f) {}
 
     void CalculateCoEfficients(float samplingFrequency)
     {
@@ -79,6 +85,7 @@ public:
         a2 = (1.0f - alpha) * scale;
     }
 
+    // Filter input signal to remove unwanted high frequency noise
     float Process(float input, float samplingFrequency) override
     {
         CalculateCoEfficients(samplingFrequency);

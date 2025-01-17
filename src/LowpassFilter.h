@@ -35,16 +35,18 @@ class LowPassFilter
 {
 public:
     // Use default filter of first order if no filter type is specified
-    LowPassFilter(float cutoffFrequency, FilterType _filterType = FilterType::FIRST_ORDER)
+    LowPassFilter(float cutoffFrequency, FilterType _filterType = FilterType::FIRST_ORDER, float _prevInput1 = 0.0f, float _prevInput2 = 0.0f)
     {
         filterType = _filterType;
         switch (filterType)
         {
         case FilterType::FIRST_ORDER:
+            (void)_prevInput1;
+            (void)_prevInput2;
             lpf = new FirstOrderLPF(cutoffFrequency);
             break;
         case FilterType::SECOND_ORDER:
-            lpf = new SecondOrderLPF(cutoffFrequency);
+            lpf = new SecondOrderLPF(cutoffFrequency, _prevInput1, _prevInput2);
             break;
         default:
             break;
