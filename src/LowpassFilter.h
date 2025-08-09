@@ -36,7 +36,6 @@ class LowPassFilter
 public:
     LowPassFilter()
     {
-        cutoffFrequency = 20.0f;
         filterType = FilterType::FIRST_ORDER;
     }
     // Use default filter of first order if no filter type is specified
@@ -60,7 +59,6 @@ public:
 
     LowPassFilter(const LowPassFilter &other)
     {
-        cutoffFrequency = other.cutoffFrequency;
         filterType = other.filterType;
         switch (filterType)
         {
