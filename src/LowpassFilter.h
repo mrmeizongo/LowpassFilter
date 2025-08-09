@@ -34,6 +34,11 @@ enum class FilterType : uint8_t
 class LowPassFilter
 {
 public:
+    LowPassFilter()
+    {
+        cutoffFrequency = 20.0f;
+        filterType = FilterType::FIRST_ORDER;
+    }
     // Use default filter of first order if no filter type is specified
     LowPassFilter(float cutoffFrequency, FilterType _filterType = FilterType::FIRST_ORDER, float _prevInput1 = 0.0f, float _prevInput2 = 0.0f)
     {
@@ -53,9 +58,30 @@ public:
         }
     }
 
+    LowPassFilter(const LowPassFilter &other)
+    {
+        cutoffFrequency = other.cutoffFrequency;
+        filterType = other.filterType;
+        switch (filterType)
+        {
+        case FilterType::FIRST_ORDER:
+            lpf = new FirstOrderLPF(cutoffFrequency);
+            break;
+        case FilterType::SECOND_ORDER:
+            lpf = new SecondOrderLPF(cutoffFrequency, 0.0f, 0.0f);
+            break;
+        default:
+            lpf = nullptr;
+            break;
+        }
+    }
+
     float Process(float input, float samplingFrequency)
     {
-        return lpf->Process(input, samplingFrequency);
+        if (lpf != nullptr)
+            return lpf->Process(input, samplingFrequency);
+
+        return 0.0f;
     }
 
     FilterType getFilterType() { return filterType; }
