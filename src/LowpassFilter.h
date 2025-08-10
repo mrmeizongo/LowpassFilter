@@ -57,14 +57,14 @@ public:
         }
     }
 
-    LowPassFilter(const LowPassFilter &&other) noexcept
+    LowPassFilter(LowPassFilter &&other) noexcept
     {
         filterType = other.filterType;
         lpf = other.lpf;
         other.lpf = nullptr; // Prevent double deletion
     }
 
-    LowPassFilter &operator=(const LowPassFilter &&other) noexcept
+    LowPassFilter &operator=(LowPassFilter &&other) noexcept
     {
         if (this != &other)
         {
