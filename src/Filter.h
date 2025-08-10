@@ -25,7 +25,7 @@ SOFTWARE.
 #define FILTER_H
 #include <Arduino.h>
 
-#define CUTOFFFREQUENCY 10.0f // Default cutoff frequency for the filter
+#define CUTOFFFREQUENCY 10 // Default cutoff frequency for the filter
 
 // Abstract class for filters. All filters must implement the Process function
 template <typename T>
@@ -42,7 +42,7 @@ template <typename T>
 class FirstOrderLPF : public Filter<T>
 {
 public:
-    FirstOrderLPF(float cutoffFrequency = CUTOFFFREQUENCY)
+    FirstOrderLPF(uint16_t cutoffFrequency = CUTOFFFREQUENCY)
     {
         rc = 1.0f / (2.0f * M_PI * cutoffFrequency);
         prevOutput = T{};
@@ -67,7 +67,7 @@ template <typename T>
 class SecondOrderLPF : public Filter<T>
 {
 public:
-    SecondOrderLPF(float cutoffFrequency = CUTOFFFREQUENCY, T _prevInput1 = T{}, T _prevInput2 = T{})
+    SecondOrderLPF(uint16_t cutoffFrequency = CUTOFFFREQUENCY, T _prevInput1 = T{}, T _prevInput2 = T{})
         : cutoffFrequency(cutoffFrequency), prevInput1(_prevInput1), prevInput2(_prevInput2), prevOutput1(T{}), prevOutput2(T{}) {}
 
     void CalculateCoEfficients(float samplingFrequency)
@@ -104,7 +104,7 @@ public:
     }
 
 private:
-    float cutoffFrequency;
+    uint16_t cutoffFrequency;
     float a1, a2, b0, b1, b2;                           // Filter coefficients
     T prevInput1, prevInput2, prevOutput1, prevOutput2; // Previous input and output values
 };

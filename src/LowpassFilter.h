@@ -36,7 +36,7 @@ class LowPassFilter
 {
 public:
     // Use default filter of first order if no filter type is specified
-    LowPassFilter(float cutoffFrequency = CUTOFFFREQUENCY, FilterType _filterType = FilterType::FIRST_ORDER, T _prevInput1 = T{}, T _prevInput2 = T{})
+    LowPassFilter(uint16_t cutoffFrequency = CUTOFFFREQUENCY, FilterType _filterType = FilterType::FIRST_ORDER, T _prevInput1 = T{}, T _prevInput2 = T{})
     {
         filterType = _filterType;
         switch (filterType)
