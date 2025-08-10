@@ -76,7 +76,7 @@ public:
     T Process(T input, float samplingFrequency)
     {
         if (lpf != nullptr)
-            return lpf->Process<T>(input, samplingFrequency);
+            return lpf->Process(input, samplingFrequency);
     }
 
     FilterType getFilterType() { return filterType; }
