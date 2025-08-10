@@ -54,6 +54,7 @@ public:
         }
     }
 
+    LowPassFilter(const LowPassFilter &) = delete;
     LowPassFilter(LowPassFilter &&other) noexcept
     {
         filterType = other.filterType;
@@ -89,7 +90,7 @@ public:
     }
 
 private:
-    Filter<T> *lpf;
+    Filter<T> *lpf = nullptr; // Pointer to the filter instance
     FilterType filterType;
 };
 
