@@ -77,6 +77,8 @@ public:
     {
         if (lpf != nullptr)
             return lpf->Process(input, samplingFrequency);
+
+        return T{}; // Return default value if filter is not initialized
     }
 
     FilterType getFilterType() { return filterType; }
