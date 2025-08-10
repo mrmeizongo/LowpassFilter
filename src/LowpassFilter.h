@@ -87,7 +87,7 @@ public:
     }
 
 private:
-    Filter *lpf;
+    Filter<T> *lpf;
     FilterType filterType;
 };
 
