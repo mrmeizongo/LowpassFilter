@@ -42,10 +42,10 @@ template <typename T>
 class FirstOrderLPF : public Filter<T>
 {
 public:
-    FirstOrderLPF(float cutoffFrequency)
+    FirstOrderLPF(float cutoffFrequency = 10.0f)
     {
         rc = 1.0f / (2.0f * M_PI * cutoffFrequency);
-        prevOutput = 0;
+        prevOutput = T{};
     }
 
     // Filter input signal to remove unwanted high frequency noise
@@ -64,11 +64,11 @@ private:
 // More computationally expensive than first order filter but more effective, has faster roll-off and more flexibility
 // See https://en.wikipedia.org/wiki/Butterworth_filter#Normalized_Butterworth_polynomials
 template <typename T>
-class SecondOrderLPF : public Filter
+class SecondOrderLPF : public Filter<T>
 {
 public:
-    SecondOrderLPF(float cutoffFrequency, T _prevInput1, T _prevInput2)
-        : cutoffFrequency(cutoffFrequency), prevInput1(_prevInput1), prevInput2(_prevInput2), prevOutput1(0.0f), prevOutput2(0.0f) {}
+    SecondOrderLPF(float cutoffFrequency = 10.0f, T _prevInput1 = T{}, T _prevInput2 = T{})
+        : cutoffFrequency(cutoffFrequency), prevInput1(_prevInput1), prevInput2(_prevInput2), prevOutput1(T{}), prevOutput2(T{}) {}
 
     void CalculateCoEfficients(float samplingFrequency)
     {

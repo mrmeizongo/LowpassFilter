@@ -31,15 +31,17 @@ enum class FilterType : uint8_t
     SECOND_ORDER
 };
 
+template <typename T>
 class LowPassFilter
 {
 public:
     LowPassFilter()
     {
         filterType = FilterType::FIRST_ORDER;
+        lpf = new FirstOrderLPF<T>(cutoffFrequency);
     }
     // Use default filter of first order if no filter type is specified
-    LowPassFilter(float cutoffFrequency, FilterType _filterType = FilterType::FIRST_ORDER, float _prevInput1 = 0.0f, float _prevInput2 = 0.0f)
+    LowPassFilter(float cutoffFrequency, FilterType _filterType = FilterType::FIRST_ORDER, T _prevInput1 = T{}, T _prevInput2 = T{})
     {
         filterType = _filterType;
         switch (filterType)
@@ -47,10 +49,10 @@ public:
         case FilterType::FIRST_ORDER:
             (void)_prevInput1;
             (void)_prevInput2;
-            lpf = new FirstOrderLPF(cutoffFrequency);
+            lpf = new FirstOrderLPF<T>(cutoffFrequency);
             break;
         case FilterType::SECOND_ORDER:
-            lpf = new SecondOrderLPF(cutoffFrequency, _prevInput1, _prevInput2);
+            lpf = new SecondOrderLPF<T>(cutoffFrequency, _prevInput1, _prevInput2);
             break;
         default:
             break;
@@ -76,11 +78,10 @@ public:
         return *this;
     }
 
-    template <typename T>
     T Process(T input, float samplingFrequency)
     {
         if (lpf != nullptr)
-            return lpf->Process(input, samplingFrequency);
+            return lpf->Process<T>(input, samplingFrequency);
     }
 
     FilterType getFilterType() { return filterType; }

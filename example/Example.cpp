@@ -5,7 +5,7 @@
 #define SAMPLERATEHZ 50
 #define SIGNALINPUTLENGTH 10
 
-LowPassFilter lpf{CUTOFFFREQUENCY, FilterType::SECOND_ORDER};
+LowPassFilter<float> lpf{CUTOFFFREQUENCY, FilterType::SECOND_ORDER};
 void setup()
 {
     Serial.begin(9600);
