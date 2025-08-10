@@ -38,7 +38,7 @@ public:
     LowPassFilter()
     {
         filterType = FilterType::FIRST_ORDER;
-        lpf = new FirstOrderLPF<T>(cutoffFrequency);
+        lpf = new FirstOrderLPF<T>();
     }
     // Use default filter of first order if no filter type is specified
     LowPassFilter(float cutoffFrequency, FilterType _filterType = FilterType::FIRST_ORDER, T _prevInput1 = T{}, T _prevInput2 = T{})
