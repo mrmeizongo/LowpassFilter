@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Users/mrmei/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "C:/Users/mrmei/.platformio/packages/framework-arduino-avr/variants/eightanaloginputs",
+                "C:/Users/mrmei/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "C:/Users/mrmei/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "C:/Users/mrmei/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.26100.0",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "${default}",
+            "compilerPath": "C:/Users/mrmei/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe"
+        }
+    ],
+    "version": 4
+}
