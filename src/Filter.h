@@ -86,10 +86,11 @@ public:
     }
 
     // Filter input signal to remove unwanted high frequency noise
-    float Process(float input, float samplingFrequency) override
+    template <typename T>
+    T Process(T input, float samplingFrequency) override
     {
         CalculateCoEfficients(samplingFrequency);
-        float output = (b0 * input) + (b1 * prevInput1) + (b2 * prevInput2) - (a1 * prevOutput1) - (a2 * prevOutput2);
+        T output = static_cast<T>((b0 * input) + (b1 * prevInput1) + (b2 * prevInput2) - (a1 * prevOutput1) - (a2 * prevOutput2));
 
         // Update previous values
         prevInput2 = prevInput1;

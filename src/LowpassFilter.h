@@ -76,12 +76,11 @@ public:
         return *this;
     }
 
-    float Process(float input, float samplingFrequency)
+    template <typename T>
+    T Process(T input, float samplingFrequency)
     {
         if (lpf != nullptr)
             return lpf->Process(input, samplingFrequency);
-
-        return 0.0f;
     }
 
     FilterType getFilterType() { return filterType; }
