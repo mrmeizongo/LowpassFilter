@@ -57,21 +57,23 @@ public:
         }
     }
 
-    LowPassFilter(const LowPassFilter &other)
+    LowPassFilter(const LowPassFilter &&other) noexcept
     {
         filterType = other.filterType;
-        switch (filterType)
+        lpf = other.lpf;
+        other.lpf = nullptr; // Prevent double deletion
+    }
+
+    LowPassFilter &operator=(const LowPassFilter &&other) noexcept
+    {
+        if (this != &other)
         {
-        case FilterType::FIRST_ORDER:
-            lpf = new FirstOrderLPF(cutoffFrequency);
-            break;
-        case FilterType::SECOND_ORDER:
-            lpf = new SecondOrderLPF(cutoffFrequency, 0.0f, 0.0f);
-            break;
-        default:
-            lpf = nullptr;
-            break;
+            delete lpf; // Clean up existing filter
+            filterType = other.filterType;
+            lpf = other.lpf;
+            other.lpf = nullptr; // Prevent double deletion
         }
+        return *this;
     }
 
     float Process(float input, float samplingFrequency)
