@@ -25,7 +25,7 @@ SOFTWARE.
 #define FILTER_H
 #include <Arduino.h>
 
-#define SQRT2 1.4142135623730950488f // Hard coded value of sqrt(2) to save execution cycles
+#define CUTOFFFREQUENCY 10.0f // Default cutoff frequency for the filter
 
 // Abstract class for filters. All filters must implement the Process function
 template <typename T>
@@ -42,7 +42,7 @@ template <typename T>
 class FirstOrderLPF : public Filter<T>
 {
 public:
-    FirstOrderLPF(float cutoffFrequency = 10.0f)
+    FirstOrderLPF(float cutoffFrequency = CUTOFFFREQUENCY)
     {
         rc = 1.0f / (2.0f * M_PI * cutoffFrequency);
         prevOutput = T{};
@@ -51,7 +51,7 @@ public:
     // Filter input signal to remove unwanted high frequency noise
     T Process(T input, float samplingFrequency) override
     {
-        // Calculate alpha based on the cuttoff frequency and sampling frequency
+        // Calculate alpha based on the cutoff and sampling frequencies
         prevOutput = static_cast<T>(prevOutput + ((samplingFrequency / (rc + samplingFrequency)) * (input - prevOutput)));
         return prevOutput;
     }
@@ -67,7 +67,7 @@ template <typename T>
 class SecondOrderLPF : public Filter<T>
 {
 public:
-    SecondOrderLPF(float cutoffFrequency = 10.0f, T _prevInput1 = T{}, T _prevInput2 = T{})
+    SecondOrderLPF(float cutoffFrequency = CUTOFFFREQUENCY, T _prevInput1 = T{}, T _prevInput2 = T{})
         : cutoffFrequency(cutoffFrequency), prevInput1(_prevInput1), prevInput2(_prevInput2), prevOutput1(T{}), prevOutput2(T{}) {}
 
     void CalculateCoEfficients(float samplingFrequency)
@@ -78,7 +78,7 @@ public:
         float cosOmega = cos(omega);
 
         // Compute Butterworth coefficients
-        float alpha = sinOmega / SQRT2;
+        float alpha = sinOmega / M_SQRT2;
         float scale = 1.0f / (1.0f + alpha);
 
         b0 = (1.0f - cosOmega) / (2.0f * scale);
