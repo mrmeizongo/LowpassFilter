@@ -28,43 +28,46 @@ SOFTWARE.
 #define SQRT2 1.4142135623730950488f // Hard coded value of sqrt(2) to save execution cycles
 
 // Abstract class for filters. All filters must implement the Process function
+template <typename T>
 class Filter
 {
 public:
-    virtual float Process(float, float) = 0;
+    virtual T Process(T, float) = 0;
     virtual ~Filter() = default;
 };
 
 // Computationally less expensive than second order filter but less effective, has slower roll-off and limited flexibility
 // See https://en.wikipedia.org/wiki/Low-pass_filter#RC_filter
-class FirstOrderLPF : public Filter
+template <typename T>
+class FirstOrderLPF : public Filter<T>
 {
 public:
     FirstOrderLPF(float cutoffFrequency)
     {
         rc = 1.0f / (2.0f * M_PI * cutoffFrequency);
-        prevOutput = 0.0f;
+        prevOutput = 0;
     }
 
     // Filter input signal to remove unwanted high frequency noise
-    float Process(float input, float samplingFrequency) override
+    T Process(T input, float samplingFrequency) override
     {
         // Calculate alpha based on the cuttoff frequency and sampling frequency
-        prevOutput = prevOutput + ((samplingFrequency / (rc + samplingFrequency)) * (input - prevOutput));
+        prevOutput = static_cast<T>(prevOutput + ((samplingFrequency / (rc + samplingFrequency)) * (input - prevOutput)));
         return prevOutput;
     }
 
 private:
-    float prevOutput; // Previous output value
+    T prevOutput; // Previous output value
     float rc;
 };
 
 // More computationally expensive than first order filter but more effective, has faster roll-off and more flexibility
 // See https://en.wikipedia.org/wiki/Butterworth_filter#Normalized_Butterworth_polynomials
+template <typename T>
 class SecondOrderLPF : public Filter
 {
 public:
-    SecondOrderLPF(float cutoffFrequency, float _prevInput1, float _prevInput2)
+    SecondOrderLPF(float cutoffFrequency, T _prevInput1, T _prevInput2)
         : cutoffFrequency(cutoffFrequency), prevInput1(_prevInput1), prevInput2(_prevInput2), prevOutput1(0.0f), prevOutput2(0.0f) {}
 
     void CalculateCoEfficients(float samplingFrequency)
@@ -86,7 +89,6 @@ public:
     }
 
     // Filter input signal to remove unwanted high frequency noise
-    template <typename T>
     T Process(T input, float samplingFrequency) override
     {
         CalculateCoEfficients(samplingFrequency);
@@ -103,7 +105,7 @@ public:
 
 private:
     float cutoffFrequency;
-    float a1, a2, b0, b1, b2;                               // Filter coefficients
-    float prevInput1, prevInput2, prevOutput1, prevOutput2; // Previous input and output values
+    float a1, a2, b0, b1, b2;                           // Filter coefficients
+    T prevInput1, prevInput2, prevOutput1, prevOutput2; // Previous input and output values
 };
 #endif // FILTER_H
