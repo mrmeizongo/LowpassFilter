@@ -92,7 +92,7 @@ private:
 
     void CalculateCoEfficients(float samplingFrequency)
     {
-        float omega = 2.0f * M_PI * (cutoffFrequency / samplingFrequency);
+        float omega = 2.0f * M_PI * (cutoffFrequency * samplingFrequency);
         float sinOmega = sin(omega);
         float cosOmega = cos(omega);
         float alpha = sinOmega / (2.0f * M_SQRT2);
