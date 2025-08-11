@@ -70,24 +70,6 @@ public:
     SecondOrderLPF(uint16_t cutoffFrequency = CUTOFFFREQUENCY, T _prevInput1 = T{}, T _prevInput2 = T{})
         : cutoffFrequency(cutoffFrequency), prevInput1(_prevInput1), prevInput2(_prevInput2), prevOutput1(T{}), prevOutput2(T{}) {}
 
-    void CalculateCoEfficients(float samplingFrequency)
-    {
-        // Calculate normalized cutoff frequency
-        float omega = 2.0f * M_PI * (cutoffFrequency * samplingFrequency);
-        float sinOmega = sin(omega);
-        float cosOmega = cos(omega);
-
-        // Compute Butterworth coefficients
-        float alpha = sinOmega / M_SQRT2;
-        float scale = 1.0f / (1.0f + alpha);
-
-        b0 = (1.0f - cosOmega) / (2.0f * scale);
-        b1 = (1.0f - cosOmega) * scale;
-        b2 = b0;
-        a1 = -2.0f * cosOmega * scale;
-        a2 = (1.0f - alpha) * scale;
-    }
-
     // Filter input signal to remove unwanted high frequency noise
     T Process(T input, float samplingFrequency) override
     {
@@ -107,5 +89,27 @@ private:
     uint16_t cutoffFrequency;
     float a1, a2, b0, b1, b2;                           // Filter coefficients
     T prevInput1, prevInput2, prevOutput1, prevOutput2; // Previous input and output values
+
+    void CalculateCoEfficients(float samplingFrequency)
+    {
+        float omega = 2.0f * M_PI * (cutoffFrequency / samplingFrequency);
+        float sinOmega = sin(omega);
+        float cosOmega = cos(omega);
+        float alpha = sinOmega / (2.0f * M_SQRT2);
+
+        float a0 = 1.0f + alpha;
+        b0 = (1.0f - cosOmega) / 2.0f;
+        b1 = 1.0f - cosOmega;
+        b2 = b0;
+        a1 = -2.0f * cosOmega;
+        a2 = 1.0f - alpha;
+
+        // Normalize coefficients
+        b0 /= a0;
+        b1 /= a0;
+        b2 /= a0;
+        a1 /= a0;
+        a2 /= a0;
+    }
 };
 #endif // FILTER_H
