@@ -73,7 +73,7 @@ public:
     void CalculateCoEfficients(float samplingFrequency)
     {
         // Calculate normalized cutoff frequency
-        float omega = 2.0f * M_PI * (cutoffFrequency * samplingFrequency);
+        float omega = 2.0f * M_PI * (cutoffFrequency / samplingFrequency);
         float sinOmega = sin(omega);
         float cosOmega = cos(omega);
 
