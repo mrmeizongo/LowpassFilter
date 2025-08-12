@@ -54,22 +54,34 @@ public:
         }
     }
 
-    LowPassFilter(const LowPassFilter &) = delete;
-    LowPassFilter(LowPassFilter &&other) noexcept
+    ~LowPassFilter()
+    {
+        delete lpf;
+    }
+
+    // Copy constructor
+    LowPassFilter(const LowPassFilter &other)
+        : filterType(other.filterType), lpf(other.lpf) {}
+
+    // Move constructor
+    LowPassFilter(LowPassFilter &&other)
     {
         filterType = other.filterType;
         lpf = other.lpf;
         other.lpf = nullptr; // Prevent double deletion
     }
 
-    LowPassFilter &operator=(LowPassFilter &&other) noexcept
+    // Copy assignment operator.
+    // std::swap is not available in Arduino, so we use a simple assignment
+    // Since argument is passed by value, it will create a copy of the object using the copy constructor
+    // Destructor of the copy object will clean up the old filter when it goes out of scope
+    LowPassFilter &operator=(LowPassFilter other)
     {
         if (this != &other)
         {
             delete lpf; // Clean up existing filter
             filterType = other.filterType;
             lpf = other.lpf;
-            other.lpf = nullptr; // Prevent double deletion
         }
         return *this;
     }
@@ -83,11 +95,6 @@ public:
     }
 
     FilterType getFilterType() { return filterType; }
-
-    ~LowPassFilter()
-    {
-        delete lpf;
-    }
 
 private:
     Filter<T> *lpf = nullptr; // Pointer to the filter instance
