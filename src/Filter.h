@@ -49,10 +49,10 @@ public:
     }
 
     // Filter input signal to remove unwanted high frequency noise
-    T Process(T input, float samplingFrequency) override
+    T Process(T input, float dt) override
     {
         // Calculate alpha based on the cutoff and sampling frequencies
-        prevOutput = static_cast<T>(prevOutput + ((samplingFrequency / (rc + samplingFrequency)) * (input - prevOutput)));
+        prevOutput = static_cast<T>(prevOutput + ((dt / (rc + dt)) * (input - prevOutput)));
         return prevOutput;
     }
 
@@ -71,9 +71,9 @@ public:
         : cutoffFrequency(cutoffFrequency), prevInput1(_prevInput1), prevInput2(_prevInput2), prevOutput1(T{}), prevOutput2(T{}) {}
 
     // Filter input signal to remove unwanted high frequency noise
-    T Process(T input, float samplingFrequency) override
+    T Process(T input, float dt) override
     {
-        CalculateCoEfficients(samplingFrequency);
+        CalculateCoEfficients(dt);
         T output = static_cast<T>((b0 * input) + (b1 * prevInput1) + (b2 * prevInput2) - (a1 * prevOutput1) - (a2 * prevOutput2));
 
         // Update previous values
@@ -90,9 +90,9 @@ private:
     float a1, a2, b0, b1, b2;                           // Filter coefficients
     T prevInput1, prevInput2, prevOutput1, prevOutput2; // Previous input and output values
 
-    void CalculateCoEfficients(float samplingFrequency)
+    void CalculateCoEfficients(float dt)
     {
-        float omega = 2.0f * M_PI * (cutoffFrequency * samplingFrequency);
+        float omega = 2.0f * M_PI * (cutoffFrequency * dt);
         float sinOmega = sin(omega);
         float cosOmega = cos(omega);
         float alpha = sinOmega / (2.0f * M_SQRT2);
