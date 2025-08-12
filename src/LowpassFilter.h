@@ -36,18 +36,16 @@ class LowPassFilter
 {
 public:
     // Use default filter of first order if no filter type is specified
-    LowPassFilter(uint16_t cutoffFrequency = CUTOFFFREQUENCY, FilterType _filterType = FilterType::FIRST_ORDER, T _prevInput1 = T{}, T _prevInput2 = T{})
+    LowPassFilter(uint16_t cutoffFrequency = CUTOFFFREQUENCY, FilterType _filterType = FilterType::FIRST_ORDER)
+        : filterType(_filterType)
     {
-        filterType = _filterType;
         switch (filterType)
         {
         case FilterType::FIRST_ORDER:
-            (void)_prevInput1;
-            (void)_prevInput2;
             lpf = new FirstOrderLPF<T>(cutoffFrequency);
             break;
         case FilterType::SECOND_ORDER:
-            lpf = new SecondOrderLPF<T>(cutoffFrequency, _prevInput1, _prevInput2);
+            lpf = new SecondOrderLPF<T>(cutoffFrequency);
             break;
         default:
             break;
@@ -61,7 +59,20 @@ public:
 
     // Copy constructor
     LowPassFilter(const LowPassFilter &other)
-        : filterType(other.filterType), lpf(other.lpf) {}
+        : filterType(other.filterType)
+    {
+        switch (filterType)
+        {
+        case FilterType::FIRST_ORDER:
+            lpf = new FirstOrderLPF<T>(cutoffFrequency);
+            break;
+        case FilterType::SECOND_ORDER:
+            lpf = new SecondOrderLPF<T>(cutoffFrequency);
+            break;
+        default:
+            break;
+        }
+    }
 
     // Move constructor
     LowPassFilter(LowPassFilter &&other)
@@ -86,7 +97,7 @@ public:
         return *this;
     }
 
-    T Process(T input, float samplingFrequency)
+    T Process(T input, float samplingFrequency) const
     {
         if (lpf != nullptr)
             return lpf->Process(input, samplingFrequency);
@@ -94,7 +105,7 @@ public:
         return T{}; // Return default value if filter is not initialized
     }
 
-    FilterType getFilterType() { return filterType; }
+    FilterType getFilterType() const { return filterType; }
 
 private:
     Filter<T> *lpf = nullptr; // Pointer to the filter instance

@@ -25,7 +25,7 @@ SOFTWARE.
 #define FILTER_H
 #include <Arduino.h>
 
-#define CUTOFFFREQUENCY 10 // Default cutoff frequency for the filter
+static constexpr uint16_t CUTOFFFREQUENCY = 20; // Default cutoff frequency in Hz
 
 // Abstract class for filters. All filters must implement the Process function
 template <typename T>
@@ -67,8 +67,8 @@ template <typename T>
 class SecondOrderLPF : public Filter<T>
 {
 public:
-    SecondOrderLPF(uint16_t cutoffFrequency = CUTOFFFREQUENCY, T _prevInput1 = T{}, T _prevInput2 = T{})
-        : cutoffFrequency(cutoffFrequency), prevInput1(_prevInput1), prevInput2(_prevInput2), prevOutput1(T{}), prevOutput2(T{}) {}
+    SecondOrderLPF(uint16_t cutoffFrequency = CUTOFFFREQUENCY)
+        : cutoffFrequency(cutoffFrequency), prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{}) {}
 
     // Filter input signal to remove unwanted high frequency noise
     T Process(T input, float dt) override
