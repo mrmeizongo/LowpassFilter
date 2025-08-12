@@ -36,8 +36,9 @@ class LowPassFilter
 {
 public:
     LowPassFilter(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, FilterType _filterType = FilterType::FIRST_ORDER)
-        : cutoffFrequency(_cutoffFrequency), filterType(_filterType)
     {
+        cutoffFrequency = _cutoffFrequency;
+        filterType = _filterType;
         switch (filterType)
         {
         case FilterType::FIRST_ORDER:
@@ -58,8 +59,9 @@ public:
 
     // Copy constructor
     LowPassFilter(const LowPassFilter &other)
-        : cutoffFrequency(other.cutoffFrequency), filterType(other.filterType)
     {
+        cutoffFrequency = other.cutoffFrequency;
+        filterType = other.filterType;
         switch (filterType)
         {
         case FilterType::FIRST_ORDER:
@@ -98,7 +100,7 @@ public:
         return *this;
     }
 
-    T Process(T input, float samplingFrequency) const
+    T Process(T input, float samplingFrequency)
     {
         if (lpf != nullptr)
             return lpf->Process(input, samplingFrequency);
