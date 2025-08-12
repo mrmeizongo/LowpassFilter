@@ -35,9 +35,8 @@ template <typename T>
 class LowPassFilter
 {
 public:
-    // Use default filter of first order if no filter type is specified
-    LowPassFilter(uint16_t cutoffFrequency = CUTOFFFREQUENCY, FilterType _filterType = FilterType::FIRST_ORDER)
-        : filterType(_filterType)
+    LowPassFilter(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, FilterType _filterType = FilterType::FIRST_ORDER)
+        : cutoffFrequency(_cutoffFrequency), filterType(_filterType)
     {
         switch (filterType)
         {
@@ -59,7 +58,7 @@ public:
 
     // Copy constructor
     LowPassFilter(const LowPassFilter &other)
-        : filterType(other.filterType)
+        : cutoffFrequency(other.cutoffFrequency), filterType(other.filterType)
     {
         switch (filterType)
         {
@@ -77,6 +76,7 @@ public:
     // Move constructor
     LowPassFilter(LowPassFilter &&other)
     {
+        cutoffFrequency = other.cutoffFrequency;
         filterType = other.filterType;
         lpf = other.lpf;
         other.lpf = nullptr; // Prevent double deletion
@@ -91,6 +91,7 @@ public:
         if (this != &other)
         {
             delete lpf; // Clean up existing filter
+            cutoffFrequency = other.cutoffFrequency;
             filterType = other.filterType;
             lpf = other.lpf;
         }
@@ -109,6 +110,7 @@ public:
 
 private:
     Filter<T> *lpf = nullptr; // Pointer to the filter instance
+    uint16_t cutoffFrequency;
     FilterType filterType;
 };
 
