@@ -1,11 +1,11 @@
 #include <Arduino>
 #include <LowpassFilter.h>
 
-#define CUTOFFFREQUENCY 20.0f
-#define SAMPLERATEHZ 50
-#define SIGNALINPUTLENGTH 10
+static constexpr float CUTOFFFREQUENCY = 20.0f;
+static constexpr float SAMPLERATE = 1.0; // in milliseconds i.e. 1ms = 1kHz sample rate
+static constexpr uint8_t SIGNALINPUTLENGTH = 10;
 
-LowPassFilter<float> lpf{CUTOFFFREQUENCY, FilterType::SECOND_ORDER};
+LowPassFilter<float> lpf{CUTOFFFREQUENCY, FilterType::FIRST_ORDER};
 void setup()
 {
     Serial.begin(9600);
@@ -14,9 +14,10 @@ void setup()
 
     float inputSignal[SIGNALINPUTLENGTH] = {10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f, 70.0f, 80.0f, 90.0f, 100.0f};
     Serial.print("Filtered output: ");
-    for (int i = 0; i < SIGNALINPUTLENGTH; i++)
+    for (uint8_t i = 0; i < SIGNALINPUTLENGTH; i++)
     {
-        float filteredOutput = lpf.Process(inputSignal[i], SAMPLERATEHZ * 0.001f);
+        float dt = SAMPLERATE * 0.001f; // Convert milliseconds to seconds
+        float filteredOutput = lpf.Process(inputSignal[i], dt);
         Serial.print(filteredOutput);
         Serial.print(" ");
     }
