@@ -25,7 +25,7 @@ SOFTWARE.
 #define FILTER_H
 #include <Arduino.h>
 
-#define CUTOFFFREQUENCY 20; // Default cutoff frequency in Hz
+#define CUTOFFFREQUENCY 20 // Default cutoff frequency in Hz
 
 // Abstract class for filters. All filters must implement the Process function
 template <typename T>
