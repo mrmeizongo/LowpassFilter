@@ -106,7 +106,7 @@ public:
 
     friend void swap(LowPassFilter &first, LowPassFilter &second) noexcept
     {
-        T *temp = first.lpf;
+        Filter<T> *temp = first.lpf;
         first.lpf = second.lpf;
         second.lpf = temp;
 
