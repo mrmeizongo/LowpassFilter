@@ -96,10 +96,7 @@ public:
     // Filter input signal to remove unwanted high frequency noise
     T Process(T input, float samplingFrequency)
     {
-        if (lpf != nullptr)
-            return lpf->Process(input, samplingFrequency);
-
-        return T{}; // Return default value if filter is not initialized
+        return lpf->Process(input, samplingFrequency);
     }
 
     FilterType getFilterType() const { return filterType; }
