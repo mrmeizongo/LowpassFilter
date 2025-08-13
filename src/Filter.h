@@ -32,7 +32,7 @@ template <typename T>
 class Filter
 {
 public:
-    T Process(T input, float dt) = 0;
+    virtual T Process(T input, float dt) = 0;
     virtual ~Filter() = default;
 };
 
