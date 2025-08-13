@@ -27,7 +27,8 @@ SOFTWARE.
 
 enum class FilterType : uint8_t
 {
-    FIRST_ORDER = 0U,
+    NONE = 0U,
+    FIRST_ORDER,
     SECOND_ORDER
 };
 
@@ -36,11 +37,11 @@ class LowPassFilter
 {
 public:
     LowPassFilter(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, FilterType _filterType = FilterType::FIRST_ORDER)
+        : cutoffFrequency(_cutoffFrequency), filterType(_filterType)
     {
-        cutoffFrequency = _cutoffFrequency;
-        filterType = _filterType;
         switch (filterType)
         {
+        case FilterType::NONE:
         case FilterType::FIRST_ORDER:
             lpf = new FirstOrderLPF<T>(cutoffFrequency);
             break;
@@ -59,11 +60,11 @@ public:
 
     // Copy constructor
     LowPassFilter(const LowPassFilter &other)
+        : cutoffFrequency(other.cutoffFrequency), filterType(other.filterType)
     {
-        cutoffFrequency = other.cutoffFrequency;
-        filterType = other.filterType;
         switch (filterType)
         {
+        case FilterType::NONE:
         case FilterType::FIRST_ORDER:
             lpf = new FirstOrderLPF<T>(cutoffFrequency);
             break;
@@ -77,25 +78,49 @@ public:
 
     // Move constructor
     LowPassFilter(LowPassFilter &&other)
+        : cutoffFrequency(other.cutoffFrequency), filterType(other.filterType), lpf(other.lpf)
     {
-        cutoffFrequency = other.cutoffFrequency;
-        filterType = other.filterType;
-        lpf = other.lpf;
         other.lpf = nullptr; // Prevent double deletion
+        other.cutoffFrequency = 0;
+        other.filterType = FilterType::NONE;
     }
 
     // Copy assignment operator.
-    // std::swap is not available in Arduino, so we use a simple assignment
-    // Since argument is passed by value, it will create a copy of the object using the copy constructor
-    // Destructor of the copy object will clean up the old filter when it goes out of scope
-    LowPassFilter &operator=(LowPassFilter other)
+    LowPassFilter &operator=(LowPassFilter &other)
     {
         if (this != &other)
         {
             delete lpf; // Clean up existing filter
             cutoffFrequency = other.cutoffFrequency;
             filterType = other.filterType;
-            lpf = other.lpf;
+            switch (filterType)
+            {
+            case FilterType::NONE:
+            case FilterType::FIRST_ORDER:
+                lpf = new FirstOrderLPF<T>(cutoffFrequency);
+                break;
+            case FilterType::SECOND_ORDER:
+                lpf = new SecondOrderLPF<T>(cutoffFrequency);
+                break;
+            default:
+                break;
+            }
+        }
+        return *this;
+    }
+
+    // Move assignment operator.
+    LowPassFilter &operator=(LowPassFilter &&other)
+    {
+        if (this != &other)
+        {
+            delete lpf; // Clean up existing filter
+            cutoffFrequency = other.cutoffFrequency;
+            filterType = other.filterType;
+            lpf = other.lpf;     // Take ownership of the filter
+            other.lpf = nullptr; // Prevent double deletion
+            other.cutoffFrequency = 0;
+            other.filterType = FilterType::NONE;
         }
         return *this;
     }
