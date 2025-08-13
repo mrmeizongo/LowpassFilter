@@ -28,21 +28,18 @@ SOFTWARE.
 #define CUTOFFFREQUENCY 20 // Default cutoff frequency in Hz
 
 // Abstract class for filters. All filters must implement the Process function
-template <typename T, Derived>
+template <typename T>
 class Filter
 {
 public:
-    T Process(T input, float dt)
-    {
-        return static_cast<Derived *>(this)->Process(input, dt);
-    }
+    T Process(T input, float dt) = 0;
     virtual ~Filter() = default;
 };
 
 // Computationally less expensive than second order filter but less effective, has slower roll-off and limited flexibility
 // See https://en.wikipedia.org/wiki/Low-pass_filter#RC_filter
 template <typename T>
-class FirstOrderLPF : public Filter<T, FirstOrderLPF<T>>
+class FirstOrderLPF : public Filter<T>
 {
     T prevOutput; // Previous output value
     float rc;
@@ -55,7 +52,7 @@ public:
     }
 
     // Filter input signal to remove unwanted high frequency noise
-    T Process(T input, float dt)
+    T Process(T input, float dt) override
     {
         // Calculate alpha based on the cutoff and sampling frequencies
         prevOutput = static_cast<T>(prevOutput + ((dt / (rc + dt)) * (input - prevOutput)));
@@ -99,7 +96,7 @@ public:
         : cutoffFrequency(cutoffFrequency), prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{}) {}
 
     // Filter input signal to remove unwanted high frequency noise
-    T Process(T input, float dt)
+    T Process(T input, float dt) override
     {
         CalculateCoEfficients(dt);
         T output = static_cast<T>((b0 * input) + (b1 * prevInput1) + (b2 * prevInput2) - (a1 * prevOutput1) - (a2 * prevOutput2));
