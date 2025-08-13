@@ -27,21 +27,23 @@ SOFTWARE.
 
 enum class FilterType : uint8_t
 {
-    NONE = 0U,
-    FIRST_ORDER,
+    FIRST_ORDER = 0U,
     SECOND_ORDER
 };
 
 template <typename T>
 class LowPassFilter
 {
+    Filter<T> *lpf = nullptr; // Pointer to the filter instance
+    uint16_t cutoffFrequency;
+    FilterType filterType;
+
 public:
     LowPassFilter(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, FilterType _filterType = FilterType::FIRST_ORDER)
         : cutoffFrequency(_cutoffFrequency), filterType(_filterType)
     {
         switch (filterType)
         {
-        case FilterType::NONE:
         case FilterType::FIRST_ORDER:
             lpf = new FirstOrderLPF<T>(cutoffFrequency);
             break;
@@ -56,6 +58,8 @@ public:
     ~LowPassFilter()
     {
         delete lpf;
+        cutoffFrequency = 0;
+        filterType = FilterType::FIRST_ORDER; // Reset to default
     }
 
     // Copy constructor
@@ -64,7 +68,6 @@ public:
     {
         switch (filterType)
         {
-        case FilterType::NONE:
         case FilterType::FIRST_ORDER:
             lpf = new FirstOrderLPF<T>(cutoffFrequency);
             break;
@@ -78,53 +81,19 @@ public:
 
     // Move constructor
     LowPassFilter(LowPassFilter &&other)
-        : cutoffFrequency(other.cutoffFrequency), filterType(other.filterType), lpf(other.lpf)
+        : LowPassFilter() // Delegate to the default constructor
     {
-        other.lpf = nullptr; // Prevent double deletion
-        other.cutoffFrequency = 0;
-        other.filterType = FilterType::NONE;
+        swap(*this, other); // Use the swap function to handle resource management
     }
 
-    // Copy assignment operator.
-    LowPassFilter &operator=(LowPassFilter &other)
+    // Assignment operator
+    LowPassFilter &operator=(LowPassFilter other) // copy by value
     {
-        if (this != &other)
-        {
-            delete lpf; // Clean up existing filter
-            cutoffFrequency = other.cutoffFrequency;
-            filterType = other.filterType;
-            switch (filterType)
-            {
-            case FilterType::NONE:
-            case FilterType::FIRST_ORDER:
-                lpf = new FirstOrderLPF<T>(cutoffFrequency);
-                break;
-            case FilterType::SECOND_ORDER:
-                lpf = new SecondOrderLPF<T>(cutoffFrequency);
-                break;
-            default:
-                break;
-            }
-        }
+        swap(*this, other); // Use the swap function to handle self-assignment and cleanup
         return *this;
     }
 
-    // Move assignment operator.
-    LowPassFilter &operator=(LowPassFilter &&other)
-    {
-        if (this != &other)
-        {
-            delete lpf; // Clean up existing filter
-            cutoffFrequency = other.cutoffFrequency;
-            filterType = other.filterType;
-            lpf = other.lpf;     // Take ownership of the filter
-            other.lpf = nullptr; // Prevent double deletion
-            other.cutoffFrequency = 0;
-            other.filterType = FilterType::NONE;
-        }
-        return *this;
-    }
-
+    // Filter input signal to remove unwanted high frequency noise
     T Process(T input, float samplingFrequency)
     {
         if (lpf != nullptr)
@@ -135,10 +104,20 @@ public:
 
     FilterType getFilterType() const { return filterType; }
 
-private:
-    Filter<T> *lpf = nullptr; // Pointer to the filter instance
-    uint16_t cutoffFrequency;
-    FilterType filterType;
+    friend void swap(LowPassFilter &first, LowPassFilter &second) noexcept
+    {
+        T *temp = first.lpf;
+        first.lpf = second.lpf;
+        second.lpf = temp;
+
+        uint16_t tempCutoff = first.cutoffFrequency;
+        first.cutoffFrequency = second.cutoffFrequency;
+        second.cutoffFrequency = tempCutoff;
+
+        FilterType tempType = first.filterType;
+        first.filterType = second.filterType;
+        second.filterType = tempType;
+    }
 };
 
 #endif // LOWPASSFILTER_H

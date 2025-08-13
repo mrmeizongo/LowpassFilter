@@ -41,6 +41,9 @@ public:
 template <typename T>
 class FirstOrderLPF : public Filter<T>
 {
+    T prevOutput; // Previous output value
+    float rc;
+
 public:
     FirstOrderLPF(uint16_t cutoffFrequency = CUTOFFFREQUENCY)
     {
@@ -55,10 +58,6 @@ public:
         prevOutput = static_cast<T>(prevOutput + ((dt / (rc + dt)) * (input - prevOutput)));
         return prevOutput;
     }
-
-private:
-    T prevOutput; // Previous output value
-    float rc;
 };
 
 // More computationally expensive than first order filter but more effective, has faster roll-off and more flexibility
@@ -66,26 +65,6 @@ private:
 template <typename T>
 class SecondOrderLPF : public Filter<T>
 {
-public:
-    SecondOrderLPF(uint16_t cutoffFrequency = CUTOFFFREQUENCY)
-        : cutoffFrequency(cutoffFrequency), prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{}) {}
-
-    // Filter input signal to remove unwanted high frequency noise
-    T Process(T input, float dt) override
-    {
-        CalculateCoEfficients(dt);
-        T output = static_cast<T>((b0 * input) + (b1 * prevInput1) + (b2 * prevInput2) - (a1 * prevOutput1) - (a2 * prevOutput2));
-
-        // Update previous values
-        prevInput2 = prevInput1;
-        prevInput1 = input;
-        prevOutput2 = prevOutput1;
-        prevOutput1 = output;
-
-        return output;
-    }
-
-private:
     uint16_t cutoffFrequency;
     float a1, a2, b0, b1, b2;                           // Filter coefficients
     T prevInput1, prevInput2, prevOutput1, prevOutput2; // Previous input and output values
@@ -110,6 +89,25 @@ private:
         b2 /= a0;
         a1 /= a0;
         a2 /= a0;
+    }
+
+public:
+    SecondOrderLPF(uint16_t cutoffFrequency = CUTOFFFREQUENCY)
+        : cutoffFrequency(cutoffFrequency), prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{}) {}
+
+    // Filter input signal to remove unwanted high frequency noise
+    T Process(T input, float dt) override
+    {
+        CalculateCoEfficients(dt);
+        T output = static_cast<T>((b0 * input) + (b1 * prevInput1) + (b2 * prevInput2) - (a1 * prevOutput1) - (a2 * prevOutput2));
+
+        // Update previous values
+        prevInput2 = prevInput1;
+        prevInput1 = input;
+        prevOutput2 = prevOutput1;
+        prevOutput1 = output;
+
+        return output;
     }
 };
 #endif // FILTER_H
