@@ -28,18 +28,21 @@ SOFTWARE.
 #define CUTOFFFREQUENCY 20 // Default cutoff frequency in Hz
 
 // Abstract class for filters. All filters must implement the Process function
-template <typename T>
+template <typename T, Derived>
 class Filter
 {
 public:
-    virtual T Process(T, float) = 0;
+    T Process(T input, float dt)
+    {
+        return static_cast<Derived *>(this)->Process(input, dt);
+    }
     virtual ~Filter() = default;
 };
 
 // Computationally less expensive than second order filter but less effective, has slower roll-off and limited flexibility
 // See https://en.wikipedia.org/wiki/Low-pass_filter#RC_filter
 template <typename T>
-class FirstOrderLPF : public Filter<T>
+class FirstOrderLPF : public Filter<T, FirstOrderLPF<T>>
 {
     T prevOutput; // Previous output value
     float rc;
@@ -52,7 +55,7 @@ public:
     }
 
     // Filter input signal to remove unwanted high frequency noise
-    T Process(T input, float dt) override
+    T Process(T input, float dt)
     {
         // Calculate alpha based on the cutoff and sampling frequencies
         prevOutput = static_cast<T>(prevOutput + ((dt / (rc + dt)) * (input - prevOutput)));
@@ -63,7 +66,7 @@ public:
 // More computationally expensive than first order filter but more effective, has faster roll-off and more flexibility
 // See https://en.wikipedia.org/wiki/Butterworth_filter#Normalized_Butterworth_polynomials
 template <typename T>
-class SecondOrderLPF : public Filter<T>
+class SecondOrderLPF : public Filter<T, SecondOrderLPF<T>>
 {
     uint16_t cutoffFrequency;
     float a1, a2, b0, b1, b2;                           // Filter coefficients
@@ -96,7 +99,7 @@ public:
         : cutoffFrequency(cutoffFrequency), prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{}) {}
 
     // Filter input signal to remove unwanted high frequency noise
-    T Process(T input, float dt) override
+    T Process(T input, float dt)
     {
         CalculateCoEfficients(dt);
         T output = static_cast<T>((b0 * input) + (b1 * prevInput1) + (b2 * prevInput2) - (a1 * prevOutput1) - (a2 * prevOutput2));
