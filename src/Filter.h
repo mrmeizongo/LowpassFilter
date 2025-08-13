@@ -63,7 +63,7 @@ public:
 // More computationally expensive than first order filter but more effective, has faster roll-off and more flexibility
 // See https://en.wikipedia.org/wiki/Butterworth_filter#Normalized_Butterworth_polynomials
 template <typename T>
-class SecondOrderLPF : public Filter<T, SecondOrderLPF<T>>
+class SecondOrderLPF : public Filter<T>
 {
     uint16_t cutoffFrequency;
     float a1, a2, b0, b1, b2;                           // Filter coefficients
