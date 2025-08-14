@@ -25,59 +25,25 @@ SOFTWARE.
 #define LOWPASSFILTER_H
 #include "Filter.h"
 
-enum class FilterType : uint8_t
-{
-    FIRST_ORDER = 0U,
-    SECOND_ORDER
-};
-
-template <typename T>
+template <typename T, template <typename> class FilterType>
 class LowPassFilter
 {
-    Filter<T> *lpf = nullptr; // Pointer to the filter instance
+    Filter<T, FilterType<T>> *lpf = nullptr; // Pointer to the filter instance
     uint16_t cutoffFrequency;
-    FilterType filterType;
 
 public:
-    LowPassFilter(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, FilterType _filterType = FilterType::FIRST_ORDER)
-        : cutoffFrequency(_cutoffFrequency), filterType(_filterType)
-    {
-        switch (filterType)
-        {
-        case FilterType::FIRST_ORDER:
-            lpf = new FirstOrderLPF<T>(cutoffFrequency);
-            break;
-        case FilterType::SECOND_ORDER:
-            lpf = new SecondOrderLPF<T>(cutoffFrequency);
-            break;
-        default:
-            break;
-        }
-    }
+    LowPassFilter(uint16_t _cutoffFrequency = CUTOFFFREQUENCY)
+        : cutoffFrequency(_cutoffFrequency), lpf(new Filter<T, FilterType<T>>(cutoffFrequency)) {}
 
     ~LowPassFilter()
     {
         delete lpf;
         cutoffFrequency = 0;
-        filterType = FilterType::FIRST_ORDER; // Reset to default
     }
 
     // Copy constructor
     LowPassFilter(const LowPassFilter &other)
-        : cutoffFrequency(other.cutoffFrequency), filterType(other.filterType)
-    {
-        switch (filterType)
-        {
-        case FilterType::FIRST_ORDER:
-            lpf = new FirstOrderLPF<T>(cutoffFrequency);
-            break;
-        case FilterType::SECOND_ORDER:
-            lpf = new SecondOrderLPF<T>(cutoffFrequency);
-            break;
-        default:
-            break;
-        }
-    }
+        : cutoffFrequency(other.cutoffFrequency) lpf(new Filter<T, FilterType<T>>(other.cutoffFrequency)) {}
 
     // Move constructor
     LowPassFilter(LowPassFilter &&other)
@@ -103,17 +69,13 @@ public:
 
     friend void swap(LowPassFilter &first, LowPassFilter &second) noexcept
     {
-        Filter<T> *temp = first.lpf;
+        Filter<T, FilterType<T>> *temp = first.lpf;
         first.lpf = second.lpf;
         second.lpf = temp;
 
         uint16_t tempCutoff = first.cutoffFrequency;
         first.cutoffFrequency = second.cutoffFrequency;
         second.cutoffFrequency = tempCutoff;
-
-        FilterType tempType = first.filterType;
-        first.filterType = second.filterType;
-        second.filterType = tempType;
     }
 };
 
