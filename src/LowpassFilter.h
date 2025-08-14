@@ -36,6 +36,12 @@ public:
     {
         return static_cast<FilterType<T> *>(this)->ProcessImpl(input, dt);
     }
+
+    void Reset()
+    {
+        static_cast<FilterType<T> *>(this)->ResetImpl();
+    }
+
     virtual ~Filter() = default;
 };
 
@@ -60,6 +66,11 @@ public:
         // Calculate alpha based on the cutoff and sampling frequencies
         prevOutput = static_cast<T>(prevOutput + ((dt / (rc + dt)) * (input - prevOutput)));
         return prevOutput;
+    }
+
+    void ResetImpl()
+    {
+        prevOutput = T{};
     }
 };
 
@@ -111,6 +122,14 @@ public:
         prevOutput1 = output;
 
         return output;
+    }
+
+    void ResetImpl()
+    {
+        prevInput1 = T{};
+        prevInput2 = T{};
+        prevOutput1 = T{};
+        prevOutput2 = T{};
     }
 };
 #endif // FILTER_H
