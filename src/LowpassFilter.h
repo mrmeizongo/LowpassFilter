@@ -25,7 +25,7 @@ SOFTWARE.
 #define FILTER_H
 #include <Arduino.h>
 
-#define CUTOFFFREQUENCY 20 // Default cutoff frequency in Hz
+static constexpr uint16_t CUTOFFFREQUENCY = 20; // Default cutoff frequency in Hz
 
 // Abstract template class for filters
 template <typename T, template <typename> class FilterType>
@@ -48,8 +48,7 @@ class FirstOrderLPF : public Filter<T, FirstOrderLPF>
     float rc;
 
 public:
-    FirstOrderLPF() {}
-    FirstOrderLPF(uint16_t _cutoffFrequency)
+    FirstOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY)
         : prevOutput(T{})
     {
         rc = 1.0f / (2.0f * M_PI * _cutoffFrequency);
@@ -96,8 +95,7 @@ class SecondOrderLPF : public Filter<T, SecondOrderLPF>
     }
 
 public:
-    SecondOrderLPF() {}
-    SecondOrderLPF(uint16_t _cutoffFrequency)
+    SecondOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY)
         : cutoffFrequency(_cutoffFrequency), prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{}) {}
 
     // Filter input signal to remove unwanted high frequency noise
