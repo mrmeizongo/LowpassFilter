@@ -28,8 +28,8 @@ SOFTWARE.
 template <typename T, template <typename> class FilterType>
 class LowPassFilter
 {
-    Filter<T, FilterType> *lpf = nullptr; // Pointer to the filter instance
     uint16_t cutoffFrequency;
+    Filter<T, FilterType> *lpf = nullptr; // Pointer to the filter instance
 
 public:
     LowPassFilter(uint16_t _cutoffFrequency = CUTOFFFREQUENCY)

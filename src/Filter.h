@@ -57,8 +57,8 @@ public:
     FirstOrderLPF(uint16_t _cutoffFrequency)
         : Filter<T, FirstOrderLPF>(_cutoffFrequency)
     {
-        rc = 1.0f / (2.0f * M_PI * this->cutoffFrequency);
         prevOutput = T{};
+        rc = 1.0f / (2.0f * M_PI * this->cutoffFrequency);
     }
 
     // Filter input signal to remove unwanted high frequency noise
