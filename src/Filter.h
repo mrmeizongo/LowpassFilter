@@ -57,7 +57,7 @@ public:
     FirstOrderLPF(uint16_t _cutoffFrequency)
         : Filter<T, FirstOrderLPF>(_cutoffFrequency)
     {
-        rc = 1.0f / (2.0f * M_PI * cutoffFrequency);
+        rc = 1.0f / (2.0f * M_PI * this->cutoffFrequency);
         prevOutput = T{};
     }
 
@@ -80,7 +80,7 @@ class SecondOrderLPF : public Filter<T, SecondOrderLPF>
 
     void CalculateCoEfficients(float dt)
     {
-        float omega = 2.0f * M_PI * (cutoffFrequency * dt);
+        float omega = 2.0f * M_PI * (this->cutoffFrequency * dt);
         float sinOmega = sin(omega);
         float cosOmega = cos(omega);
         float alpha = sinOmega / (2.0f * M_SQRT2);
