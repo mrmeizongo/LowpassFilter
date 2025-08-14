@@ -43,7 +43,7 @@ public:
 
     // Copy constructor
     LowPassFilter(const LowPassFilter &other)
-        : cutoffFrequency(other.cutoffFrequency) lpf(new Filter<T, FilterType>(other.cutoffFrequency)) {}
+        : cutoffFrequency(other.cutoffFrequency), lpf(new Filter<T, FilterType>(other.cutoffFrequency)) {}
 
     // Move constructor
     LowPassFilter(LowPassFilter &&other)
