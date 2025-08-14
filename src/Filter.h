@@ -27,7 +27,7 @@ SOFTWARE.
 
 #define CUTOFFFREQUENCY 20 // Default cutoff frequency in Hz
 
-// Abstract class for filters. All filters must implement the Process function
+// Abstract template class for filters
 template <typename T, template <typename> class FilterType>
 class Filter
 {

@@ -33,7 +33,7 @@ class LowPassFilter
 
 public:
     LowPassFilter(uint16_t _cutoffFrequency = CUTOFFFREQUENCY)
-        : cutoffFrequency(_cutoffFrequency), lpf(new Filter<T, FilterType>(cutoffFrequency)) {}
+        : cutoffFrequency(_cutoffFrequency), lpf(new Filter<T, FilterType>(_cutoffFrequency)) {}
 
     ~LowPassFilter()
     {

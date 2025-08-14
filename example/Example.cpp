@@ -5,7 +5,10 @@ static constexpr float CUTOFFFREQUENCY = 20.0f;
 static constexpr float SAMPLERATE = 1.0; // in milliseconds i.e. 1ms = 1kHz sample rate
 static constexpr uint8_t SIGNALINPUTLENGTH = 10;
 
-LowPassFilter<float> lpf{CUTOFFFREQUENCY, FilterType::FIRST_ORDER};
+// Second template parameter is the filter type, e.g., FirstOrderLPF or SecondOrderLPF
+// This allows for flexibility in choosing the filter implementation at compile time
+// Implemented using CRTP to eliminate overhead incurred using virtual functions to improve performance
+LowPassFilter<float, FirstOrderLPF> lpf{CUTOFFFREQUENCY};
 void setup()
 {
     Serial.begin(9600);
