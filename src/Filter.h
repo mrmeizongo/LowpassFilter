@@ -31,6 +31,7 @@ SOFTWARE.
 template <typename T, template <typename> class FilterType>
 class Filter
 {
+protected:
     uint16_t cutoffFrequency;
 
 public:
