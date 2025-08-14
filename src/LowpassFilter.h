@@ -28,12 +28,12 @@ SOFTWARE.
 template <typename T, template <typename> class FilterType>
 class LowPassFilter
 {
-    Filter<T, FilterType<T>> *lpf = nullptr; // Pointer to the filter instance
+    Filter<T, FilterType> *lpf = nullptr; // Pointer to the filter instance
     uint16_t cutoffFrequency;
 
 public:
     LowPassFilter(uint16_t _cutoffFrequency = CUTOFFFREQUENCY)
-        : cutoffFrequency(_cutoffFrequency), lpf(new Filter<T, FilterType<T>>(cutoffFrequency)) {}
+        : cutoffFrequency(_cutoffFrequency), lpf(new Filter<T, FilterType>(cutoffFrequency)) {}
 
     ~LowPassFilter()
     {
@@ -43,7 +43,7 @@ public:
 
     // Copy constructor
     LowPassFilter(const LowPassFilter &other)
-        : cutoffFrequency(other.cutoffFrequency) lpf(new Filter<T, FilterType<T>>(other.cutoffFrequency)) {}
+        : cutoffFrequency(other.cutoffFrequency) lpf(new Filter<T, FilterType>(other.cutoffFrequency)) {}
 
     // Move constructor
     LowPassFilter(LowPassFilter &&other)
@@ -69,7 +69,7 @@ public:
 
     friend void swap(LowPassFilter &first, LowPassFilter &second) noexcept
     {
-        Filter<T, FilterType<T>> *temp = first.lpf;
+        Filter<T, FilterType> *temp = first.lpf;
         first.lpf = second.lpf;
         second.lpf = temp;
 

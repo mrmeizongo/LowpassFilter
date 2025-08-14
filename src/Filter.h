@@ -42,7 +42,7 @@ public:
 // Computationally less expensive than second order filter but less effective, has slower roll-off and limited flexibility
 // See https://en.wikipedia.org/wiki/Low-pass_filter#RC_filter
 template <typename T>
-class FirstOrderLPF : public Filter<T, FirstOrderLPF<T>>
+class FirstOrderLPF : public Filter<T, FirstOrderLPF>
 {
     T prevOutput; // Previous output value
     float rc;
@@ -66,7 +66,7 @@ public:
 // More computationally expensive than first order filter but more effective, has faster roll-off and more flexibility
 // See https://en.wikipedia.org/wiki/Butterworth_filter#Normalized_Butterworth_polynomials
 template <typename T>
-class SecondOrderLPF : public Filter<T, SecondOrderLPF<T>>
+class SecondOrderLPF : public Filter<T, SecondOrderLPF>
 {
     uint16_t cutoffFrequency;
     float a1, a2, b0, b1, b2;                           // Filter coefficients
