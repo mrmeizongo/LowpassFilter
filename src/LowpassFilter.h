@@ -21,60 +21,96 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
  */
-#ifndef LOWPASSFILTER_H
-#define LOWPASSFILTER_H
-#include "Filter.h"
+#ifndef FILTER_H
+#define FILTER_H
+#include <Arduino.h>
 
+#define CUTOFFFREQUENCY 20 // Default cutoff frequency in Hz
+
+// Abstract template class for filters
 template <typename T, template <typename> class FilterType>
-class LowPassFilter
+class Filter
 {
-    uint16_t cutoffFrequency;
-    Filter<T, FilterType> *lpf = nullptr; // Pointer to the filter instance
+public:
+    T Process(T input, float dt)
+    {
+        return static_cast<FilterType<T> *>(this)->ProcessImpl(input, dt);
+    }
+    virtual ~Filter() = default;
+};
+
+// Computationally less expensive than second order filter but less effective, has slower roll-off and limited flexibility
+// See https://en.wikipedia.org/wiki/Low-pass_filter#RC_filter
+template <typename T>
+class FirstOrderLPF : public Filter<T, FirstOrderLPF>
+{
+    T prevOutput; // Previous output value
+    float rc;
 
 public:
-    LowPassFilter(uint16_t _cutoffFrequency = CUTOFFFREQUENCY)
-        : cutoffFrequency(_cutoffFrequency), lpf(new Filter<T, FilterType>(_cutoffFrequency)) {}
-
-    ~LowPassFilter()
+    FirstOrderLPF(uint16_t _cutoffFrequency)
+        : prevOutput(T{})
     {
-        delete lpf;
-        cutoffFrequency = 0;
-    }
-
-    // Copy constructor
-    LowPassFilter(const LowPassFilter &other)
-        : cutoffFrequency(other.cutoffFrequency), lpf(new Filter<T, FilterType>(other.cutoffFrequency)) {}
-
-    // Move constructor
-    LowPassFilter(LowPassFilter &&other)
-        : LowPassFilter() // Delegate to the default constructor
-    {
-        swap(*this, other); // Use the swap function to handle resource management
-    }
-
-    // Assignment operator
-    LowPassFilter &operator=(LowPassFilter other) // copy by value
-    {
-        swap(*this, other); // Use the swap function to handle self-assignment and cleanup
-        return *this;
+        rc = 1.0f / (2.0f * M_PI * this->cutoffFrequency);
     }
 
     // Filter input signal to remove unwanted high frequency noise
-    T Process(T input, float samplingFrequency)
+    T ProcessImpl(T input, float dt)
     {
-        return lpf->Process(input, samplingFrequency);
-    }
-
-    friend void swap(LowPassFilter &first, LowPassFilter &second) noexcept
-    {
-        Filter<T, FilterType> *temp = first.lpf;
-        first.lpf = second.lpf;
-        second.lpf = temp;
-
-        uint16_t tempCutoff = first.cutoffFrequency;
-        first.cutoffFrequency = second.cutoffFrequency;
-        second.cutoffFrequency = tempCutoff;
+        // Calculate alpha based on the cutoff and sampling frequencies
+        prevOutput = static_cast<T>(prevOutput + ((dt / (rc + dt)) * (input - prevOutput)));
+        return prevOutput;
     }
 };
 
-#endif // LOWPASSFILTER_H
+// More computationally expensive than first order filter but more effective, has faster roll-off and more flexibility
+// See https://en.wikipedia.org/wiki/Butterworth_filter#Normalized_Butterworth_polynomials
+template <typename T>
+class SecondOrderLPF : public Filter<T, SecondOrderLPF>
+{
+    uint16_t cutoffFrequency;
+    float a1, a2, b0, b1, b2;                           // Filter coefficients
+    T prevInput1, prevInput2, prevOutput1, prevOutput2; // Previous input and output values
+
+    void CalculateCoEfficients(float dt)
+    {
+        float omega = 2.0f * M_PI * (cutoffFrequency * dt);
+        float sinOmega = sin(omega);
+        float cosOmega = cos(omega);
+        float alpha = sinOmega / (2.0f * M_SQRT2);
+
+        float a0 = 1.0f + alpha;
+        b0 = (1.0f - cosOmega) / 2.0f;
+        b1 = 1.0f - cosOmega;
+        b2 = b0;
+        a1 = -2.0f * cosOmega;
+        a2 = 1.0f - alpha;
+
+        // Normalize coefficients
+        b0 /= a0;
+        b1 /= a0;
+        b2 /= a0;
+        a1 /= a0;
+        a2 /= a0;
+    }
+
+public:
+    SecondOrderLPF(uint16_t _cutoffFrequency)
+        : cutoffFrequency(_cutoffFrequency), prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{}) {}
+
+    // Filter input signal to remove unwanted high frequency noise
+    T ProcessImpl(T input, float dt)
+    {
+        CalculateCoEfficients(dt);
+        T output = static_cast<T>((b0 * input) + (b1 * prevInput1) + (b2 * prevInput2) - (a1 * prevOutput1) - (a2 * prevOutput2));
+
+        // Update previous values
+        prevInput2 = prevInput1;
+        prevInput1 = input;
+        prevOutput2 = prevOutput1;
+        prevOutput1 = output;
+
+        return output;
+    }
+};
+#endif // FILTER_H
