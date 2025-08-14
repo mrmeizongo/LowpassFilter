@@ -48,10 +48,11 @@ class FirstOrderLPF : public Filter<T, FirstOrderLPF>
     float rc;
 
 public:
+    FirstOrderLPF() {}
     FirstOrderLPF(uint16_t _cutoffFrequency)
         : prevOutput(T{})
     {
-        rc = 1.0f / (2.0f * M_PI * this->cutoffFrequency);
+        rc = 1.0f / (2.0f * M_PI * _cutoffFrequency);
     }
 
     // Filter input signal to remove unwanted high frequency noise
@@ -95,6 +96,7 @@ class SecondOrderLPF : public Filter<T, SecondOrderLPF>
     }
 
 public:
+    SecondOrderLPF() {}
     SecondOrderLPF(uint16_t _cutoffFrequency)
         : cutoffFrequency(_cutoffFrequency), prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{}) {}
 
