@@ -65,8 +65,6 @@ public:
         return lpf->Process(input, samplingFrequency);
     }
 
-    FilterType getFilterType() const { return filterType; }
-
     friend void swap(LowPassFilter &first, LowPassFilter &second) noexcept
     {
         Filter<T, FilterType> *temp = first.lpf;
