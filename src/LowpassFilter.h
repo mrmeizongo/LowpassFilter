@@ -32,9 +32,9 @@ template <typename T, template <typename> class FilterType>
 class Filter
 {
 public:
-    T Process(T input, float dt)
+    T Process(T input)
     {
-        return static_cast<FilterType<T> *>(this)->ProcessImpl(input, dt);
+        return static_cast<FilterType<T> *>(this)->ProcessImpl(input);
     }
 
     void Reset()
