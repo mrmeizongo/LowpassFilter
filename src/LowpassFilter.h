@@ -52,7 +52,7 @@ class FirstOrderLPF : public Filter<T, FirstOrderLPF>
 {
     T prevOutput; // Previous output value
     float rc;
-    float alpa;
+    float alpha;
 
 public:
     FirstOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, float dt = 0.001f)
