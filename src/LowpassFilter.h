@@ -52,19 +52,21 @@ class FirstOrderLPF : public Filter<T, FirstOrderLPF>
 {
     T prevOutput; // Previous output value
     float rc;
+    float alpa;
 
 public:
-    FirstOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY)
+    FirstOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, float dt = 0.001f)
         : prevOutput(T{})
     {
         rc = 1.0f / (2.0f * M_PI * _cutoffFrequency);
+        alpha = dt / (rc + dt);
     }
 
     // Filter input signal to remove unwanted high frequency noise
     T ProcessImpl(T input, float dt)
     {
         // Calculate alpha based on the cutoff and sampling frequencies
-        prevOutput = static_cast<T>(prevOutput + ((dt / (rc + dt)) * (input - prevOutput)));
+        prevOutput = static_cast<T>(prevOutput + (alpha * (input - prevOutput)));
         return prevOutput;
     }
 
@@ -106,13 +108,15 @@ class SecondOrderLPF : public Filter<T, SecondOrderLPF>
     }
 
 public:
-    SecondOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY)
-        : cutoffFrequency(_cutoffFrequency), prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{}) {}
+    SecondOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, float dt = 0.001f)
+        : cutoffFrequency(_cutoffFrequency), prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{})
+    {
+        CalculateCoEfficients(dt);
+    }
 
     // Filter input signal to remove unwanted high frequency noise
     T ProcessImpl(T input, float dt)
     {
-        CalculateCoEfficients(dt);
         T output = static_cast<T>((b0 * input) + (b1 * prevInput1) + (b2 * prevInput2) - (a1 * prevOutput1) - (a2 * prevOutput2));
 
         // Update previous values
