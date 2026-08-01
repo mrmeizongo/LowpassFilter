@@ -50,10 +50,6 @@ public:
 template <typename T>
 class FirstOrderLPF : public Filter<T, FirstOrderLPF>
 {
-    T prevOutput; // Previous output value
-    float rc;
-    float alpha;
-
 public:
     FirstOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, float dt = 0.001f)
         : prevOutput(T{})
@@ -74,6 +70,11 @@ public:
     {
         prevOutput = T{};
     }
+
+private:
+    T prevOutput; // Previous output value
+    float rc;
+    float alpha;
 };
 
 // More computationally expensive than first order filter but more effective, has faster roll-off and more flexibility
@@ -81,32 +82,6 @@ public:
 template <typename T>
 class SecondOrderLPF : public Filter<T, SecondOrderLPF>
 {
-    uint16_t cutoffFrequency;
-    float a1, a2, b0, b1, b2;                           // Filter coefficients
-    T prevInput1, prevInput2, prevOutput1, prevOutput2; // Previous input and output values
-
-    void CalculateCoEfficients(float dt)
-    {
-        float omega = 2.0f * M_PI * (cutoffFrequency * dt);
-        float sinOmega = sin(omega);
-        float cosOmega = cos(omega);
-        float alpha = sinOmega / (2.0f * M_SQRT2);
-
-        float a0 = 1.0f + alpha;
-        b0 = (1.0f - cosOmega) / 2.0f;
-        b1 = 1.0f - cosOmega;
-        b2 = b0;
-        a1 = -2.0f * cosOmega;
-        a2 = 1.0f - alpha;
-
-        // Normalize coefficients
-        b0 /= a0;
-        b1 /= a0;
-        b2 /= a0;
-        a1 /= a0;
-        a2 /= a0;
-    }
-
 public:
     SecondOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, float dt = 0.001f)
         : cutoffFrequency(_cutoffFrequency), prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{})
@@ -134,6 +109,33 @@ public:
         prevInput2 = T{};
         prevOutput1 = T{};
         prevOutput2 = T{};
+    }
+
+private:
+    uint16_t cutoffFrequency;
+    float a1, a2, b0, b1, b2;                           // Filter coefficients
+    T prevInput1, prevInput2, prevOutput1, prevOutput2; // Previous input and output values
+
+    void CalculateCoEfficients(float dt)
+    {
+        float omega = 2.0f * M_PI * (cutoffFrequency * dt);
+        float sinOmega = sin(omega);
+        float cosOmega = cos(omega);
+        float alpha = sinOmega / (2.0f * M_SQRT2);
+
+        float a0 = 1.0f + alpha;
+        b0 = (1.0f - cosOmega) / 2.0f;
+        b1 = 1.0f - cosOmega;
+        b2 = b0;
+        a1 = -2.0f * cosOmega;
+        a2 = 1.0f - alpha;
+
+        // Normalize coefficients
+        b0 /= a0;
+        b1 /= a0;
+        b2 /= a0;
+        a1 /= a0;
+        a2 /= a0;
     }
 };
 #endif // FILTER_H
