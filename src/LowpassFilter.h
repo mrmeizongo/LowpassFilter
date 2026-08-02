@@ -86,7 +86,24 @@ public:
     SecondOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, float dt = 0.001f)
         : prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{})
     {
-        CalculateCoEfficients(_cutoffFrequency, dt);
+        float omega = 2.0f * M_PI * (_cutoffFrequency * dt);
+        float sinOmega = sin(omega);
+        float cosOmega = cos(omega);
+        float alpha = sinOmega / (2.0f * M_SQRT2);
+
+        float a0 = 1.0f + alpha;
+        b0 = (1.0f - cosOmega) / 2.0f;
+        b1 = 1.0f - cosOmega;
+        b2 = b0;
+        a1 = -2.0f * cosOmega;
+        a2 = 1.0f - alpha;
+
+        // Normalize coefficients
+        b0 /= a0;
+        b1 /= a0;
+        b2 /= a0;
+        a1 /= a0;
+        a2 /= a0;
     }
 
     // Filter input signal to remove unwanted high frequency noise
@@ -114,27 +131,5 @@ public:
 private:
     float a1, a2, b0, b1, b2;                           // Filter coefficients
     T prevInput1, prevInput2, prevOutput1, prevOutput2; // Previous input and output values
-
-    void CalculateCoEfficients(uint16_t _cutoffFrequency, float dt)
-    {
-        float omega = 2.0f * M_PI * (_cutoffFrequency * dt);
-        float sinOmega = sin(omega);
-        float cosOmega = cos(omega);
-        float alpha = sinOmega / (2.0f * M_SQRT2);
-
-        float a0 = 1.0f + alpha;
-        b0 = (1.0f - cosOmega) / 2.0f;
-        b1 = 1.0f - cosOmega;
-        b2 = b0;
-        a1 = -2.0f * cosOmega;
-        a2 = 1.0f - alpha;
-
-        // Normalize coefficients
-        b0 /= a0;
-        b1 /= a0;
-        b2 /= a0;
-        a1 /= a0;
-        a2 /= a0;
-    }
 };
 #endif // FILTER_H
