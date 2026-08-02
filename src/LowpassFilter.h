@@ -84,9 +84,9 @@ class SecondOrderLPF : public Filter<T, SecondOrderLPF>
 {
 public:
     SecondOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, float dt = 0.001f)
-        : cutoffFrequency(_cutoffFrequency), prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{})
+        : prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{})
     {
-        CalculateCoEfficients(dt);
+        CalculateCoEfficients(_cutoffFrequency, dt);
     }
 
     // Filter input signal to remove unwanted high frequency noise
@@ -112,13 +112,12 @@ public:
     }
 
 private:
-    uint16_t cutoffFrequency;
     float a1, a2, b0, b1, b2;                           // Filter coefficients
     T prevInput1, prevInput2, prevOutput1, prevOutput2; // Previous input and output values
 
-    void CalculateCoEfficients(float dt)
+    void CalculateCoEfficients(uint16_t _cutoffFrequency, float dt)
     {
-        float omega = 2.0f * M_PI * (cutoffFrequency * dt);
+        float omega = 2.0f * M_PI * (_cutoffFrequency * dt);
         float sinOmega = sin(omega);
         float cosOmega = cos(omega);
         float alpha = sinOmega / (2.0f * M_SQRT2);

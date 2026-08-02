@@ -16,8 +16,31 @@
                 "_UNICODE"
             ],
             "windowsSdkVersion": "10.0.26100.0",
-            "cStandard": "c17",
-            "cppStandard": "c++17",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
+            "intelliSenseMode": "${default}",
+            "compilerPath": "C:/msys64/ucrt64/bin/g++.exe"
+        },
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Users/mrmei/OneDrive/Documents/vscode/projects/LowpassFilter\\example",
+                "C:/Users/mrmei/.platformio/packages/framework-arduino-avr/cores/arduino",
+                "C:/Users/mrmei/.platformio/packages/framework-arduino-avr/variants/eightanaloginputs",
+                "C:/Users/mrmei/.platformio/packages/framework-arduino-avr/libraries/HID/src",
+                "C:/Users/mrmei/.platformio/packages/framework-arduino-avr/libraries/SPI/src",
+                "C:/Users/mrmei/.platformio/packages/framework-arduino-avr/libraries/SoftwareSerial/src"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE",
+                "ARDUINO_ARCH_AVR"
+            ],
+            "windowsSdkVersion": "10.0.26100.0",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++11",
             "intelliSenseMode": "${default}",
             "compilerPath": "C:/Users/mrmei/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe"
         }
