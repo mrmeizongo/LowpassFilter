@@ -52,7 +52,7 @@ class FirstOrderLPF : public Filter<T, FirstOrderLPF>
 {
 public:
     FirstOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, float dt = 0.001f)
-        : prevOutput(T{})
+        : prevOutput{T{}}
     {
         rc = 1.0f / (2.0f * M_PI * _cutoffFrequency);
         alpha = dt / (rc + dt);
@@ -84,7 +84,7 @@ class SecondOrderLPF : public Filter<T, SecondOrderLPF>
 {
 public:
     SecondOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, float dt = 0.001f)
-        : prevInput1(T{}), prevInput2(T{}), prevOutput1(T{}), prevOutput2(T{})
+        : prevInput1{T{}}, prevInput2{T{}}, prevOutput1{T{}}, prevOutput2{T{}}
     {
         float omega = 2.0f * M_PI * (_cutoffFrequency * dt);
         float sinOmega = sin(omega);
