@@ -51,6 +51,7 @@ template <typename T>
 class FirstOrderLPF : public Filter<T, FirstOrderLPF>
 {
 public:
+    FirstOrderLPF() = default;
     FirstOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, float dt = 0.001f)
         : prevOutput{T{}}
     {
@@ -86,6 +87,7 @@ template <typename T>
 class SecondOrderLPF : public Filter<T, SecondOrderLPF>
 {
 public:
+    SecondOrderLPF() = default;
     SecondOrderLPF(uint16_t _cutoffFrequency = CUTOFFFREQUENCY, float dt = 0.001f)
         : prevInput1{T{}}, prevInput2{T{}}, prevOutput1{T{}}, prevOutput2{T{}}
     {
