@@ -58,6 +58,8 @@ public:
         alpha = dt / (rc + dt);
     }
 
+    FirstOrderLPF &operator=(const FirstOrderLPF &other) = default;
+
     // Filter input signal to remove unwanted high frequency noise
     T ProcessImpl(T input)
     {
@@ -105,6 +107,8 @@ public:
         a1 /= a0;
         a2 /= a0;
     }
+
+    SecondOrderLPF &operator=(const SecondOrderLPF &other) = default;
 
     // Filter input signal to remove unwanted high frequency noise
     T ProcessImpl(T input)
